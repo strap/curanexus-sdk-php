@@ -2,7 +2,7 @@
 
 	require_once './strap.class.php';
 
-	$strap = new StrapSDK("QNIODsZ4pPRbeLlEsXElu3W7C0zjS2W3");
+	$strap = new StrapSDK("Replace with Read Token for Project");
 
 	echo "Tests<hr><hr>";
 	echo "<b>Endpoints</b><br><pre>";
