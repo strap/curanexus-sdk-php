@@ -1,4 +1,4 @@
-# strapSDK
+# PHP > Server-Side SDK
 
 Strap SDK PHP provides an easy to use, chainable API for interacting with our
 API services.  Its purpose is to abstract away resource information from
@@ -31,20 +31,42 @@ Below is a basic use case.
 require_once './strap-sdk-php/strap.class.php';
 
 // Setup Strap SDK
-$strap = new StrapSDK("{Read Token for the Strap Project}");
+$strap = new Strap("{Read Token for the Strap Project}");
+
+//Optional Param can be passed in as an array
+// $strap->getActivity( ["day" => "YYYY-MM-DD", "guid" => "demo-strap"] )
+//URL resources can be passed as Strings or in the Array
+// $strap->getActivity( "demo-strap" )
 
 echo "Tests<hr><hr>";
-echo "<b>Get details of avilable Endpoints</b><br><pre>";
+echo "<b>Endpoints</b><br><pre>";
 print var_dump( $strap->endpoints() );
+// No Params
 echo "</pre>";
 
-echo "<hr><b>Get all Users</b><br><pre>";
-print var_dump( $strap->users->call() );
+echo "<hr><b>Activity</b><br><pre>";
+print var_dump( $strap->getActivity("demo-strap") );
+// URL resource: "guid"
+// Optional: "day", "count"
 
-echo "<hr><b>Activity for a User</b><br><pre>";
-print var_dump( $strap->activity->call(["guid" => "demo-strap"]) );
+echo "<hr><b>Report</b><br><pre>";
+print var_dump( $strap->getReport() );
+// URL resource: "id"
+// Optional: none
 
-echo "<hr><b>Today information for today</b><br><pre>";
-print var_dump( $strap->today->call() );
+echo "<hr><b>Today</b><br><pre>";
+print var_dump( $strap->getToday() );
+// URL resource: none
+// Optional: "guid", "page"
+
+echo "<hr><b>Trigger</b><br><pre>";
+print var_dump( $strap->getTrigger() );
+// URL resource: "id"
+// Optional: "count"
+
+echo "<hr><b>Users</b><br><pre>";
+print var_dump( $strap->getUsers() );
+// URL resource: none
+// Optional: "platform", "count"
 
 ```
