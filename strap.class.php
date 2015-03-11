@@ -10,13 +10,20 @@
  * @license BSD http://www.opensource.org/licenses/bsd-license.php
  */
 
-class StrapSDK {
+class Strap {
 
     // Cache Holder
     private $c = false;
 
 	// API Endpoint
 	private $apiURL = "https://api2.straphq.com";
+
+	private $map = ["activity" => "getActivity",
+					"report" => "getReport",
+					"today" => "getToday",
+					"trigger" => "getTrigger",
+					"users" => "getUsers"
+					];
 
 	// API Token
 	private $token = false;
@@ -62,9 +69,35 @@ class StrapSDK {
 
   	}
 
-  	// Returns an the discovery object 
+  	// All Methods 
   	public function endpoints($json = false) {
-  		return ($json) ? json_encode($this->discovery) : $this->discovery;
+
+  		return ($json) ? json_encode($this->resources) : $this->resources;
+  	}
+
+  	public function getActivity($params=null) {
+
+  		return $this->call( $this->resources["getActivity"], $params);
+  	}
+
+  	public function getReport($params=null) {
+
+  		return $this->call( $this->resources["getReport"], $params);
+  	}
+
+  	public function getToday($params=null) {
+  		
+  		return $this->call( $this->resources["getToday"], $params);
+  	}
+
+  	public function getTrigger($params=null) {
+
+  		return $this->call( $this->resources["getTrigger"], $params);
+  	}
+
+  	public function getUsers($params=null) {
+
+  		return $this->call( $this->resources["getUsers"], $params);
   	}
 
   	// Load the Dsicovery endpoint
@@ -95,7 +128,8 @@ class StrapSDK {
 
   		foreach ($this->discovery as $key => $value) {
   			
-  			$this->$key = new StrapResource($this->token, $value);
+  			$key = $this->map[$key];
+  			$this->resources[$key] = $value;
 
   		}
   	}
@@ -116,30 +150,13 @@ class StrapSDK {
 		$response = curl_exec($curl_h);
 
 		return $response;
-  	}
+ 	}
 
-}
+ 	private function call($obj, $params = null) {
 
-// The class for the resources
-class StrapResource {
+ 		$uri = $obj->uri;
 
-	private $token = "";
-	private $uri = "";
-	private $method = "";
-	private $optional = "";
-
-	public function __construct($token, $obj) {
-
-		$this->token = $token;
-		$this->uri = $obj->uri;
-		$this->method = $obj->method;
-		$this->optional = $obj->optional;
-	}
-
-	public function call($params = null) {
-
-		$pattern = 
-		preg_match("/{([^{}]+)}/", $this->uri, $matches);
+		$pattern = preg_match("/{([^{}]+)}/", $uri, $matches);
 
 		/* 
 		// Matches returns 
@@ -147,20 +164,29 @@ class StrapResource {
 		*/
 
 		// Handle all the URL strings
-		$val = ($params[$matches[1]]) ? $params[$matches[1]] : "";	
-		$this->uri = preg_replace( "/".$matches[0]."/", $val, $this->uri);
+		$val = "";
+		// If URL resource value is part of $params array
+		if($params && is_array($params) ) { 
+			$val = ($params[$matches[1]]) ? $params[$matches[1]] : "";	
+		} else if ($params && is_string($params) ) {
+			// If it is acutall only a string coming in
+			$val = $params;
+		}
+		$uri = preg_replace( "/".$matches[0]."/", $val, $uri);
 
-		if( $params[$matches[1]] ) {
+		if( is_array($params) && $params[$matches[1]] ) {
 
 			unset($params[$matches[1]]);
 
+		} else {
+			$params = [];
 		}
 
-		if($this->method == "GET" && $params) {
-			$this->uri = $this->uri.'?'.http_build_query($params);
+		if($obj->method == "GET" && $params) {
+			$uri = $uri.'?'.http_build_query($params);
 		}
 
-		$curl_h = curl_init($this->uri);
+		$curl_h = curl_init($uri);
 
 		curl_setopt($curl_h, CURLOPT_HTTPHEADER,
 		    array(
