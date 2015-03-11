@@ -1,4 +1,4 @@
-# PHP > Server-Side SDK
+# PHP > Strap Server-Side SDK
 
 Strap SDK PHP provides an easy to use, chainable API for interacting with our
 API services.  Its purpose is to abstract away resource information from
