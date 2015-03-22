@@ -80,6 +80,11 @@ class Strap {
   		return $this->call( $this->resources["getActivity"], $params);
   	}
 
+    public function getMonth($params=null) {
+      
+      return $this->call( $this->resources["getMonth"], $params);
+    }
+
   	public function getReport($params=null) {
 
   		return $this->call( $this->resources["getReport"], $params);
@@ -99,6 +104,11 @@ class Strap {
 
   		return $this->call( $this->resources["getUsers"], $params);
   	}
+
+    public function getWeek($params=null) {
+      
+      return $this->call( $this->resources["getWeek"], $params);
+    }
 
   	// Load the Dsicovery endpoint
   	private function _loadDiscover() {
