@@ -49,6 +49,11 @@ print var_dump( $strap->getActivity("demo-strap") );
 // URL resource: "guid"
 // Optional: "day", "count"
 
+echo "<hr><b>Month</b><br><pre>";
+print var_dump( $strap->getMonth() );
+// URL resource: none
+// Optional: "guid", "page", "per_page"
+
 echo "<hr><b>Report</b><br><pre>";
 print var_dump( $strap->getReport() );
 // URL resource: "id"
@@ -57,7 +62,7 @@ print var_dump( $strap->getReport() );
 echo "<hr><b>Today</b><br><pre>";
 print var_dump( $strap->getToday() );
 // URL resource: none
-// Optional: "guid", "page"
+// Optional: "guid", "page", "per_page"
 
 echo "<hr><b>Trigger</b><br><pre>";
 print var_dump( $strap->getTrigger() );
@@ -68,5 +73,10 @@ echo "<hr><b>Users</b><br><pre>";
 print var_dump( $strap->getUsers() );
 // URL resource: none
 // Optional: "platform", "count"
+
+echo "<hr><b>Week</b><br><pre>";
+print var_dump( $strap->getWeek() );
+// URL resource: none
+// Optional: "guid", "page", "per_page"
 
 ```
