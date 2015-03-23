@@ -44,7 +44,7 @@ $strap->activity->get( params, callback );
 
 // Each endpoint that supports the "page" value also exposes two additional methods and two detail values
 // Get the next set of records
-var set = $strap->month->next(); 
+$set = $strap->month->next(); 
 // Get All set of records until the max page count is reached
 $strap->month->getAll( params, callback ); 
 // Get the page information for the request
