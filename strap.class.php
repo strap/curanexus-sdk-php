@@ -18,13 +18,6 @@ class Strap {
 	// API Endpoint
 	private $apiURL = "https://api2.straphq.com";
 
-	private $map = ["activity" => "getActivity",
-					"report" => "getReport",
-					"today" => "getToday",
-					"trigger" => "getTrigger",
-					"users" => "getUsers"
-					];
-
 	// API Token
 	private $token = false;
 
@@ -72,43 +65,8 @@ class Strap {
   	// All Methods 
   	public function endpoints($json = false) {
 
-  		return ($json) ? json_encode($this->resources) : $this->resources;
+  		return ($json) ? json_encode($this->discovery) : $this->discovery;
   	}
-
-  	public function getActivity($params=null) {
-
-  		return $this->call( $this->resources["getActivity"], $params);
-  	}
-
-    public function getMonth($params=null) {
-      
-      return $this->call( $this->resources["getMonth"], $params);
-    }
-
-  	public function getReport($params=null) {
-
-  		return $this->call( $this->resources["getReport"], $params);
-  	}
-
-  	public function getToday($params=null) {
-  		
-  		return $this->call( $this->resources["getToday"], $params);
-  	}
-
-  	public function getTrigger($params=null) {
-
-  		return $this->call( $this->resources["getTrigger"], $params);
-  	}
-
-  	public function getUsers($params=null) {
-
-  		return $this->call( $this->resources["getUsers"], $params);
-  	}
-
-    public function getWeek($params=null) {
-      
-      return $this->call( $this->resources["getWeek"], $params);
-    }
 
   	// Load the Dsicovery endpoint
   	private function _loadDiscover() {
@@ -137,9 +95,9 @@ class Strap {
   	private function _buildDiscovery() {
 
   		foreach ($this->discovery as $key => $value) {
-  			
-  			$key = $this->map[$key];
-  			$this->resources[$key] = $value;
+
+  			// Create the endpoint
+        $this->$key = new StrapResource( $value, $this->token );
 
   		}
   	}
@@ -162,56 +120,218 @@ class Strap {
 		return $response;
  	}
 
- 	private function call($obj, $params = null) {
+}
 
- 		$uri = $obj->uri;
+/*
+Strap Resource for each API endpoint
+*/
 
-		$pattern = preg_match("/{([^{}]+)}/", $uri, $matches);
+class StrapResource {
 
-		/* 
-		// Matches returns 
-		array(2) { [0]=> "{guid}" [1]=> "guid" } 
-		*/
+  public $hasNext = false;
 
-		// Handle all the URL strings
-		$val = "";
-		// If URL resource value is part of $params array
-		if($params && is_array($params) ) { 
-			$val = ($params[$matches[1]]) ? $params[$matches[1]] : "";	
-		} else if ($params && is_string($params) ) {
-			// If it is acutall only a string coming in
-			$val = $params;
-		}
-		$uri = preg_replace( "/".$matches[0]."/", $val, $uri);
+  public $pageData = false;
 
-		if( is_array($params) && $params[$matches[1]] ) {
+  private $params = [];
 
-			unset($params[$matches[1]]);
+  private $details = [];
 
-		} else {
-			$params = [];
-		}
+  private $suppress = false;
 
-		if($obj->method == "GET" && $params) {
-			$uri = $uri.'?'.http_build_query($params);
-		}
+  private $token = "";
 
-		$curl_h = curl_init($uri);
+  private $pageDefault = array('page'     => 1, 
+                               'pages'    => 1,
+                               'next'     => 2,
+                               'per_page' => 30
+                               );
 
-		curl_setopt($curl_h, CURLOPT_HTTPHEADER,
-		    array(
-		        'X-Auth-Token: '.$this->token,
-		    )
-		);
+  public function __construct($details, $token) {
 
-		# do not output, but store to variable
-		curl_setopt($curl_h, CURLOPT_RETURNTRANSFER, true);
+    $this->details  = $details;
+    $this->token    = $token;
 
-		$response = json_decode( curl_exec($curl_h), true);
+    $this->pageData = $this->pageDefault;
 
-		$response = ($response) ? $response : [];
+    if ( !$details->optional || !in_array("page", $details->optional) ) {
+        $this->suppress = true;
+    }
 
-		return $response;
-	}
+  }
 
+  // Call next page
+  public function next() {
+
+    // This method should not being doing this...
+    if($this->suppress) { return false; }
+
+    if( $this->hasNext ) {
+
+      $page = [ 
+                "page"      => $this->pageData["next"],
+                "per_page"  => $this->pageData["per_page"]
+              ];
+
+      return $this->get($this->params, $page);
+
+    } else {
+      return false;
+    }
+
+  }
+
+  // Get all the records
+  public function getAll($params = null) {
+
+    // This method should not being doing this...
+    if($this->suppress) { return false; }
+
+    // Holder
+    $set = array();
+
+    //Get thing started
+    $set = $this->get($params);
+
+    // Check and then loop as necesasry
+    while( $this->hasNext ) {
+      $set = array_merge( $set, $this->next() );
+    }
+
+    return $set;
+  }
+
+
+  // Do a simple get
+  public function get($params = array(), $page = array()) {
+
+    // Set the Details information
+    $obj = $this->details;
+
+    $uri = $obj->uri;
+
+    // Store this for next()
+    $this->params = $params;
+
+    // Check the type of paramse
+    if ( $params && is_string($params) ) { // Check for only string
+        $paramString = $params;
+        $params = [];
+    }
+
+    $pattern = preg_match("/{([^{}]+)}/", $uri, $matches);
+
+    // Setup the Paging info in the request
+    $temp_page = array(
+                "page" => ( $params["page"] ) ? $params["page"] : $this->pageDefault["page"],
+                "per_page" => ( $params["per_page"] ) ? $params["per_page"] : $this->pageDefault["per_page"]
+    );
+
+    $this->pageData = array_merge($temp_page, $page );
+
+    // Merge the page data into request
+    // Give preference to params
+    $params = array_merge( $this->pageData, $params );
+
+    /* 
+    // Matches returns 
+    array(2) { [0]=> "{guid}" [1]=> "guid" } 
+    */
+
+    // Handle all the URL strings
+    $val = "";
+    // If URL resource value is part of $params array
+    if($params && is_array($params) ) { 
+      $val = ($params[$matches[1]]) ? $params[$matches[1]] : "";  
+
+    } else if ( $paramString ) {
+      // If it is acutally only a string coming in
+      $val = $paramString;
+    }
+    $uri = preg_replace( "/".$matches[0]."/", $val, $uri);
+
+    if( is_array($params) && $params[$matches[1]] ) {
+
+      unset($params[$matches[1]]);
+
+    }
+
+    if($obj->method == "GET" && $params) {
+      $uri = $uri.'?'.http_build_query($params);
+    }
+
+    echo "<hr>";
+    print var_dump($params);
+    echo "<br>";
+
+    echo "URI: ".$uri."<hr>";
+
+    $curl_h = curl_init($uri);
+
+    curl_setopt($curl_h, CURLOPT_HTTPHEADER,
+        array(
+            'X-Auth-Token: '.$this->token,
+        )
+    );
+
+    # do not output, but store to variable
+    curl_setopt($curl_h, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($curl_h, CURLOPT_VERBOSE, 1);
+    curl_setopt($curl_h, CURLOPT_HEADER, 1);
+
+    $response = curl_exec($curl_h);
+
+    // Then, after your curl_exec call:
+    $header_size = curl_getinfo($curl_h, CURLINFO_HEADER_SIZE);
+    $header = substr($response, 0, $header_size);
+    $body = substr($response, $header_size);
+
+    $hdr = $this->parseHeaders($header)[0];
+
+    // Handle the Page Headers
+    if ( $hdr["X-Pages"] == $hdr["X-Page"] ) {
+        $this->hasNext = false;
+        // Reset the Default Page information
+        $this->pageData = $this->pageDefault;
+
+    } else {
+
+        // Set the main pageData
+        $this->pageData = array_merge($this->pageData, [
+                                                        "page"   => (int)$hdr["X-Page"],
+                                                        "pages"  => (int)$hdr["X-Pages"],
+                                                        "next"   => (int)$hdr["X-Next-Page"]
+                                                    ]);
+
+        $this->hasNext = true;
+    }
+
+    return json_decode($body);
+  }
+
+  private function parseHeaders ($headerContent)
+  {
+
+      $headers = array();
+
+      // Split the string on every "double" new line.
+      $arrRequests = explode("\r\n\r\n", $headerContent);
+
+      // Loop of response headers. The "count() -1" is to 
+      //avoid an empty row for the extra line break before the body of the response.
+      for ($index = 0; $index < count($arrRequests) -1; $index++) {
+
+          foreach (explode("\r\n", $arrRequests[$index]) as $i => $line)
+          {
+              if ($i === 0)
+                  $headers[$index]['http_code'] = $line;
+              else
+              {
+                  list ($key, $value) = explode(': ', $line);
+                  $headers[$index][$key] = $value;
+              }
+          }
+      }
+
+      return $headers;
+    }
 }
