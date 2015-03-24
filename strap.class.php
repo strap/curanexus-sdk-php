@@ -181,7 +181,7 @@ class StrapResource {
   }
 
   // Get all the records
-  public function getAll($params = null) {
+  public function all($params = null) {
 
     // This method should not being doing this...
     if($this->suppress) { return false; }

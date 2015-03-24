@@ -46,7 +46,7 @@ $strap->activity->get( params, callback );
 // Get the next set of records
 $set = $strap->month->next(); 
 // Get All set of records until the max page count is reached
-$strap->month->getAll( params, callback ); 
+$strap->month->all( params, callback ); 
 // Get the page information for the request
 $strap->month->pageData // Contains the "page", "next", "pages", "per_page" information for the request
 // Check to see if there is a next page
