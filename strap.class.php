@@ -104,18 +104,18 @@ class Strap {
 
   	// Request some information
   	private function _Request($url) {
-  		$curl_h = curl_init($url);
+  		$cu = curl_init($url);
 
-		curl_setopt($curl_h, CURLOPT_HTTPHEADER,
+		curl_setopt($cu, CURLOPT_HTTPHEADER,
 		    array(
 		        'X-Auth-Token: '.$this->token,
 		    )
 		);
 
 		# do not output, but store to variable
-		curl_setopt($curl_h, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($cu, CURLOPT_RETURNTRANSFER, true);
 
-		$response = curl_exec($curl_h);
+		$response = curl_exec($cu);
 
 		return $response;
  	}
@@ -153,8 +153,12 @@ class StrapResource {
 
     $this->pageData = $this->pageDefault;
 
-    if ( !$details->optional || !in_array("page", $details->optional) ) {
-        $this->suppress = true;
+    // Check for pagination
+    $obj = $this->findMethod("GET");
+    if ( $obj ) {
+      if ( !$obj->optional || !in_array("page", $obj->optional) ) {
+          $this->suppress = true;
+      }
     }
 
   }
@@ -200,12 +204,15 @@ class StrapResource {
     return $set;
   }
 
-
-  // Do a simple get
+  // Do GET call
   public function get($params = array(), $page = array()) {
 
     // Set the Details information
-    $obj = $this->details;
+    $obj = $this->findMethod("GET");
+
+    if(!$obj) {
+      return array("error"=>"Method not allowed");
+    }
 
     $uri = $obj->uri;
 
@@ -220,18 +227,20 @@ class StrapResource {
 
     $pattern = preg_match("/{([^{}]+)}/", $uri, $matches);
 
-    // Setup the Paging info in the request
-    $temp_page = array(
-                "page" => ( $params["page"] ) ? $params["page"] : $this->pageDefault["page"],
-                "per_page" => ( $params["per_page"] ) ? $params["per_page"] : $this->pageDefault["per_page"]
-    );
+    // Do we need Pagination?
+    if( !$this->suppress ) {
+      // Setup the Paging info in the request
+      $temp_page = array(
+                  "page" => ( $params["page"] ) ? $params["page"] : $this->pageDefault["page"],
+                  "per_page" => ( $params["per_page"] ) ? $params["per_page"] : $this->pageDefault["per_page"]
+      );
 
-    $this->pageData = array_merge($temp_page, $page );
+      $this->pageData = array_merge($temp_page, $page );
 
-    // Merge the page data into request
-    // Give preference to params
-    $params = array_merge( $this->pageData, $params );
-
+      // Merge the page data into request
+      // Give preference to params
+      $params = array_merge( $this->pageData, $params );
+    }
     /* 
     // Matches returns 
     array(2) { [0]=> "{guid}" [1]=> "guid" } 
@@ -255,37 +264,154 @@ class StrapResource {
 
     }
 
-    if($obj->method == "GET" && $params) {
+    if($params) {
       $uri = $uri.'?'.http_build_query($params);
     }
 
-    echo "<hr>";
-    print var_dump($params);
-    echo "<br>";
+    return $this->call( $uri, $obj->method, $params );
+  }
 
-    echo "URI: ".$uri."<hr>";
+  // Do POST
+  public function post($params = array()) {
 
-    $curl_h = curl_init($uri);
+   // Set the Details information
+    $obj = $this->findMethod("POST");
 
-    curl_setopt($curl_h, CURLOPT_HTTPHEADER,
-        array(
-            'X-Auth-Token: '.$this->token,
-        )
-    );
+    if(!$obj) {
+      return array("error"=>"Method not allowed");
+    }
 
-    # do not output, but store to variable
-    curl_setopt($curl_h, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($curl_h, CURLOPT_VERBOSE, 1);
-    curl_setopt($curl_h, CURLOPT_HEADER, 1);
+    return $this->call( $obj->uri, $obj->method, $params );
+  }
 
-    $response = curl_exec($curl_h);
+  // Do PUT
+  public function put($params = array()) {
 
-    // Then, after your curl_exec call:
-    $header_size = curl_getinfo($curl_h, CURLINFO_HEADER_SIZE);
+   // Set the Details information
+    $obj = $this->findMethod("PUT");
+
+    if(!$obj) {
+      return array("error"=>"Method not allowed");
+    }
+
+    $uri = $obj->uri;
+
+    // Store this for next()
+    $this->params = $params;
+
+    // Check the type of paramse
+    if ( $params && is_string($params) ) { // Check for only string
+        $paramString = $params;
+        $params = [];
+    }
+
+    $pattern = preg_match("/{([^{}]+)}/", $uri, $matches);
+
+    /* 
+    // Matches returns 
+    array(2) { [0]=> "{guid}" [1]=> "guid" } 
+    */
+
+    // Handle all the URL strings
+    $val = "";
+    // If URL resource value is part of $params array
+    if($params && is_array($params) ) { 
+      $val = ($params[$matches[1]]) ? $params[$matches[1]] : "";  
+
+    } else if ( $paramString ) {
+      // If it is acutally only a string coming in
+      $val = $paramString;
+    }
+    $uri = preg_replace( "/".$matches[0]."/", $val, $uri);
+
+
+    return $this->call( $uri, $obj->method, $params );
+  }
+
+  // Do PUT
+  public function delete($params = array()) {
+
+   // Set the Details information
+    $obj = $this->findMethod("DELETE");
+
+    if(!$obj) {
+      return array("error"=>"Method not allowed");
+    }
+
+    $uri = $obj->uri;
+
+    // Store this for next()
+    $this->params = $params;
+
+    // Check the type of paramse
+    if ( $params && is_string($params) ) { // Check for only string
+        $paramString = $params;
+        $params = [];
+    }
+
+    $pattern = preg_match("/{([^{}]+)}/", $uri, $matches);
+
+    /* 
+    // Matches returns 
+    array(2) { [0]=> "{guid}" [1]=> "guid" } 
+    */
+
+    // Handle all the URL strings
+    $val = "";
+    // If URL resource value is part of $params array
+    if($params && is_array($params) ) { 
+      $val = ($params[$matches[1]]) ? $params[$matches[1]] : "";  
+
+    } else if ( $paramString ) {
+      // If it is acutally only a string coming in
+      $val = $paramString;
+    }
+    $uri = preg_replace( "/".$matches[0]."/", $val, $uri);
+
+
+    return $this->call( $uri, $obj->method, $params );
+  }
+
+  private function call( $uri, $method, $params ) {
+
+    // echo "Strap ".$method.": ".$uri." ".var_dump($params)."<hr>";
+
+    $headers = array( 'X-Auth-Token: '.$this->token );
+
+    $cu = curl_init($uri);
+
+    // POST/PUT Body
+    if($method == "POST" || $method == "PUT") {
+      $params = json_encode($params);
+
+      $headers[] = 'Content-Type: application/json';
+      $headers[] = 'Content-Length: '.strlen($params);
+      
+      curl_setopt($cu, CURLOPT_POST, 1);
+      curl_setopt($cu, CURLOPT_POSTFIELDS, $params);
+    }
+
+    // Switch the Method
+    curl_setopt($cu, CURLOPT_CUSTOMREQUEST, $method);
+
+    // Set options
+    curl_setopt($cu, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($cu, CURLOPT_VERBOSE, 1);
+    curl_setopt($cu, CURLOPT_HEADER, 1);
+    curl_setopt($cu, CURLOPT_HTTPHEADER, $headers);
+
+    $response = curl_exec($cu);
+
+    // Pull apart the response
+    $header_size = curl_getinfo($cu, CURLINFO_HEADER_SIZE);
     $header = substr($response, 0, $header_size);
     $body = substr($response, $header_size);
 
     $hdr = $this->parseHeaders($header)[0];
+
+    curl_close($cu);
+
+    echo "Response: ".$response;
 
     // Handle the Page Headers
     if ( $hdr["X-Pages"] == $hdr["X-Page"] ) {
@@ -301,37 +427,47 @@ class StrapResource {
                                                         "pages"  => (int)$hdr["X-Pages"],
                                                         "next"   => (int)$hdr["X-Next-Page"]
                                                     ]);
-
         $this->hasNext = true;
     }
 
     return json_decode($body);
   }
 
-  private function parseHeaders ($headerContent)
-  {
+  private function parseHeaders ($headerContent) {
+    
+    $headers = array();
 
-      $headers = array();
+    // Split the string on every "double" new line.
+    $arrRequests = explode("\r\n\r\n", $headerContent);
 
-      // Split the string on every "double" new line.
-      $arrRequests = explode("\r\n\r\n", $headerContent);
+    // Loop of response headers. The "count() -1" is to 
+    //avoid an empty row for the extra line break before the body of the response.
+    for ($index = 0; $index < count($arrRequests) -1; $index++) {
 
-      // Loop of response headers. The "count() -1" is to 
-      //avoid an empty row for the extra line break before the body of the response.
-      for ($index = 0; $index < count($arrRequests) -1; $index++) {
-
-          foreach (explode("\r\n", $arrRequests[$index]) as $i => $line)
-          {
-              if ($i === 0)
-                  $headers[$index]['http_code'] = $line;
-              else
-              {
-                  list ($key, $value) = explode(': ', $line);
-                  $headers[$index][$key] = $value;
-              }
-          }
-      }
-
-      return $headers;
+        foreach (explode("\r\n", $arrRequests[$index]) as $i => $line)
+        {
+            if ($i === 0)
+                $headers[$index]['http_code'] = $line;
+            else
+            {
+                list ($key, $value) = explode(': ', $line);
+                $headers[$index][$key] = $value;
+            }
+        }
     }
+
+    return $headers;
+  }
+
+  private function findMethod($type) {
+
+    // Examine the details and pull out the right type
+    foreach ($this->details as $value) {
+      if( $value->method == $type) {
+        return $value;
+      }
+    }
+    return false;
+  }
+
 }
