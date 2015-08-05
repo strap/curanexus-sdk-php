@@ -34,15 +34,15 @@ require_once './strap-sdk-php/strap.class.php';
 $strap = new Strap("{Read Token for the Strap Project}");
 
 //Optional Param can be passed in as an array
-// $strap->activity->get( ["day" => "YYYY-MM-DD", "guid" => "demo-strap"] )
+// $strap->activity->get( array("day" => "YYYY-MM-DD", "guid" => "demo-strap") )
 //URL resources can be passed as Strings or in the Array
 // $strap->activity->get( "demo-strap" )
 
 // Every endpoint has the get() method
 // Get a record or set of records
-$strap->activity->get( params, callback ); 
+$strap->activity->get( params ); 
 
-// Each endpoint that supports the "page" value also exposes two additional methods and two detail values
+// Most GET endpoints support the "page" value also exposes two additional methods and two detail values
 // Get the next set of records
 $set = $strap->month->next(); 
 // Get All set of records until the max page count is reached
@@ -53,42 +53,73 @@ $strap->month->pageData // Contains the "page", "next", "pages", "per_page" info
 $strap->month->hasNext // Contains BOOL true || false if there is more data that can be pulled
 
 echo "Tests<hr><hr>";
-echo "<b>Endpoints</b><br><pre>";
+echo "<b>Endpoints [GET]</b><br><pre>";
 print var_dump( $strap->endpoints() );
 // No Params
 echo "</pre>";
 
-echo "<hr><b>Activity</b><br><pre>";
+echo "<hr><b>Activity [GET]</b><br><pre>";
 print var_dump( $strap->activity->get("demo-strap") );
 // URL resource: "guid"
 // Optional: "day", "count"
 
-echo "<hr><b>Month</b><br><pre>";
+echo "<hr><b>Behavior [GET]</b><br><pre>";
+print var_dump( $strap->behavior->get("user-guid") );
+// URL resource: "guid"
+// Optional: none
+
+echo "<hr><b>Job [GET]</b><br><pre>";
+print var_dump( $strap->behavior->get() );
+// URL resource: "jobId"
+// Optional: "jobId", "status", "data"
+
+echo "<hr><b>Job [POST]</b><br><pre>";
+print var_dump( $strap->behavior->post( array(params) ) );
+// URL resource: none
+// Required: "name"
+// Optional: "description", "guids", "startDate", "ednDate", "notificationUrl"
+
+echo "<hr><b>Month [GET]</b><br><pre>";
 print var_dump( $strap->month->get() );
 // URL resource: none
 // Optional: "guid", "page", "per_page"
 
-echo "<hr><b>Report</b><br><pre>";
+echo "<hr><b>Report [GET]</b><br><pre>";
 print var_dump( $strap->report->get() );
 // URL resource: "id"
 // Optional: none
 
-echo "<hr><b>Today</b><br><pre>";
+echo "<hr><b>Report Raw [GET]</b><br><pre>";
+print var_dump( $strap->raw->get("reportId") );
+// URL resource: "reportId"
+// Optional: "type"
+
+echo "<hr><b>Segmentation [GET]</b><br><pre>";
+print var_dump( $strap->segmentation->get() );
+// URL resource: none
+// Optional: "period", "date"
+
+echo "<hr><b>Today [GET]</b><br><pre>";
 print var_dump( $strap->today->get() );
 // URL resource: none
 // Optional: "guid", "page", "per_page"
 
-echo "<hr><b>Trigger</b><br><pre>";
+echo "<hr><b>Trigger [GET]</b><br><pre>";
 print var_dump( $strap->trigger->get() );
 // URL resource: "id"
 // Optional: "count"
 
-echo "<hr><b>Users</b><br><pre>";
+echo "<hr><b>User [GET]</b><br><pre>";
+print var_dump( $strap->user->get("user-guid") );
+// URL resource: "guid"
+// Optional: none
+
+echo "<hr><b>Users [GET]</b><br><pre>";
 print var_dump( $strap->users->get() );
 // URL resource: none
 // Optional: "platform", "count"
 
-echo "<hr><b>Week</b><br><pre>";
+echo "<hr><b>Week [GET]</b><br><pre>";
 print var_dump( $strap->week->get() );
 // URL resource: none
 // Optional: "guid", "page", "per_page"
