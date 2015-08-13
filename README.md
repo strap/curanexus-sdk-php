@@ -34,7 +34,7 @@ require_once './strap-sdk-php/strap.class.php';
 $strap = new Strap("{Read Token for the Strap Project}");
 
 //Optional Param can be passed in as an array
-// $strap->activity->get( array("day" => "YYYY-MM-DD", "guid" => "demo-strap") )
+// $strap->activity->get( array("date" => "YYYY-MM-DD", "guid" => "demo-strap") )
 //URL resources can be passed as Strings or in the Array
 // $strap->activity->get( "demo-strap" )
 
@@ -61,7 +61,7 @@ echo "</pre>";
 echo "<hr><b>Activity [GET]</b><br><pre>";
 print var_dump( $strap->activity->get("demo-strap") );
 // URL resource: "guid"
-// Optional: "day", "count"
+// Optional: "date", "count"
 
 echo "<hr><b>Behavior [GET]</b><br><pre>";
 print var_dump( $strap->behavior->get("user-guid") );
