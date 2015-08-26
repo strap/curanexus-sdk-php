@@ -59,7 +59,7 @@ print var_dump( $strap->endpoints() );
 echo "</pre>";
 
 echo "<hr><b>Activity [GET]</b><br><pre>";
-print var_dump( $strap->activity->get("demo-strap") );
+print var_dump( $strap->activity->get("user-guid") );
 // URL resource: "guid"
 // Optional: "date", "count"
 
@@ -69,15 +69,30 @@ print var_dump( $strap->behavior->get("user-guid") );
 // Optional: none
 
 echo "<hr><b>Job [GET]</b><br><pre>";
-print var_dump( $strap->behavior->get() );
-// URL resource: "jobId"
-// Optional: "jobId", "status", "data"
+print var_dump( $strap->job->get() );
+// URL resource: "id"
+// Optional: "id", "status"
 
 echo "<hr><b>Job [POST]</b><br><pre>";
-print var_dump( $strap->behavior->post( array(params) ) );
+print var_dump( $strap->job->post( array(params) ) );
 // URL resource: none
 // Required: "name"
-// Optional: "description", "guids", "startDate", "ednDate", "notificationUrl"
+// Optional: "description", "guids", "startDate", "endDate", "notificationUrl"
+
+echo "<hr><b>Job [PUT]</b><br><pre>";
+print var_dump( $strap->job->put( array(params) ) );
+// URL resource: "id"
+// Optional: "name", "description"
+
+echo "<hr><b>Job [DELETE]</b><br><pre>";
+print var_dump( $strap->job->delete( "job-id" ) );
+// URL resource: "id"
+// Optional: none
+
+echo "<hr><b>Job Data [GET]</b><br><pre>";
+print var_dump( $strap->job_data->get() );
+// URL resource: "id"
+// Optional: none
 
 echo "<hr><b>Month [GET]</b><br><pre>";
 print var_dump( $strap->month->get() );
@@ -89,10 +104,20 @@ print var_dump( $strap->report->get() );
 // URL resource: "id"
 // Optional: none
 
-echo "<hr><b>Report Raw [GET]</b><br><pre>";
-print var_dump( $strap->raw->get("reportId") );
-// URL resource: "reportId"
+echo "<hr><b>Report Food [GET]</b><br><pre>";
+print var_dump( $strap->report_food->get("report-id") );
+// URL resource: "id"
 // Optional: "type"
+
+echo "<hr><b>Report Raw [GET]</b><br><pre>";
+print var_dump( $strap->report_raw->get("report-id") );
+// URL resource: "id"
+// Optional: "type"
+
+echo "<hr><b>Report Workout [GET]</b><br><pre>";
+print var_dump( $strap->workout->get("report-id") );
+// URL resource: "id"
+// Optional: none
 
 echo "<hr><b>Segmentation [GET]</b><br><pre>";
 print var_dump( $strap->segmentation->get() );
@@ -104,8 +129,34 @@ print var_dump( $strap->today->get() );
 // URL resource: none
 // Optional: "guid", "page", "per_page"
 
+echo "<hr><b>Trend [GET]</b><br><pre>";
+print var_dump( $strap->trend->get("user-guid") );
+// URL resource: "guid"
+// Optional: none
+
 echo "<hr><b>Trigger [GET]</b><br><pre>";
 print var_dump( $strap->trigger->get() );
+// URL resource: "id"
+// Optional: "id", "key", "type", "actionType"
+
+echo "<hr><b>Trigger [POST]</b><br><pre>";
+print var_dump( $strap->trigger->post( array(params) ) );
+// URL resource: none
+// Required: "active", "name", "type", "range", "conditions"
+// Optional: "actionType", "actionUrl" 
+
+echo "<hr><b>Trigger [PUT]</b><br><pre>";
+print var_dump( $strap->trigger->put( array(params) ) );
+// URL resource: "id"
+// Optional: "active", "name", "type", "range", "conditions", "actionType", "actionUrl" 
+
+echo "<hr><b>Trigger [DELETE]</b><br><pre>";
+print var_dump( $strap->trigger->delete( "trigger-id" ) );
+// URL resource: "id"
+// Optional: none
+
+echo "<hr><b>Trigger Data[GET]</b><br><pre>";
+print var_dump( $strap->trigger_data->get() );
 // URL resource: "id"
 // Optional: "count"
 
