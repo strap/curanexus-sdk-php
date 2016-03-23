@@ -19,13 +19,13 @@
 	print var_dump( $strap->report->get("report-id") );
 
 	echo "<hr><b>Report Food</b><br><pre>";
-	print var_dump( $strap->report_food->get("report-id") );
+	print var_dump( $strap->report_food->get( [ "id" => "report-id" ] ) );
 
 	echo "<hr><b>Report Raw</b><br><pre>";
-	print var_dump( $strap->raw->get("report-id") );
+	print var_dump( $strap->raw->get( [ "id" => "report-id" ] ) );
 
 	echo "<hr><b>Report Workout</b><br><pre>";
-	print var_dump( $strap->workout->get("report-id") );
+	print var_dump( $strap->report_workout->get( [ "id" => "report-id" ] ) );
 
 	echo "<hr><b>Today</b><br><pre>";
 	print var_dump( $strap->today->get() );
@@ -44,6 +44,9 @@
 
 	echo "<hr><b>Week</b><br><pre>";
 	print var_dump( $strap->week->get() );
+
+	echo "<hr><b>Word Cloud</b><br><pre>";
+	print var_dump( $strap->wordcloud->get() );
 
 
 ?>
