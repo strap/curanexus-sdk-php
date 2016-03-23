@@ -61,7 +61,7 @@ echo "</pre>";
 echo "<hr><b>Activity [GET]</b><br><pre>";
 print var_dump( $strap->activity->get("user-guid") );
 // URL resource: "guid"
-// Optional: "date", "count"
+// Optional: "date", "count", "start", "end"
 
 echo "<hr><b>Behavior [GET]</b><br><pre>";
 print var_dump( $strap->behavior->get("user-guid") );
@@ -105,19 +105,19 @@ print var_dump( $strap->report->get() );
 // Optional: none
 
 echo "<hr><b>Report Food [GET]</b><br><pre>";
-print var_dump( $strap->report_food->get("report-id") );
+print var_dump( $strap->report_food->get() );
 // URL resource: "id"
-// Optional: "type"
+// Optional: "food"
 
 echo "<hr><b>Report Raw [GET]</b><br><pre>";
-print var_dump( $strap->report_raw->get("report-id") );
+print var_dump( $strap->report_raw->get() );
 // URL resource: "id"
 // Optional: "type"
 
 echo "<hr><b>Report Workout [GET]</b><br><pre>";
-print var_dump( $strap->workout->get("report-id") );
+print var_dump( $strap->report_workout->get() );
 // URL resource: "id"
-// Optional: none
+// Optional: "workout"
 
 echo "<hr><b>Segmentation [GET]</b><br><pre>";
 print var_dump( $strap->segmentation->get() );
@@ -130,9 +130,9 @@ print var_dump( $strap->today->get() );
 // Optional: "guid", "page", "per_page"
 
 echo "<hr><b>Trend [GET]</b><br><pre>";
-print var_dump( $strap->trend->get("user-guid") );
-// URL resource: "guid"
-// Optional: none
+print var_dump( $strap->trend->get() );
+// URL resource:  none
+// Optional: "guid"
 
 echo "<hr><b>Trigger [GET]</b><br><pre>";
 print var_dump( $strap->trigger->get() );
@@ -174,5 +174,10 @@ echo "<hr><b>Week [GET]</b><br><pre>";
 print var_dump( $strap->week->get() );
 // URL resource: none
 // Optional: "guid", "page", "per_page"
+
+echo "<hr><b>WordCloud [GET]</b><br><pre>";
+print var_dump( $strap->wordcloud->get() );
+// URL resource: none
+// Optional: "guid"
 
 ```
