@@ -2,7 +2,7 @@
 
 	require_once './strap.class.php';
 
-	$strap = new Strap("PROJECT-READ-TOKEN");
+	$strap = new Strap("STRAP_READ_TOKEN");
 
 	echo "GET Tests<hr><hr>";
 	echo "<b>Endpoints</b><br><pre>";
@@ -10,7 +10,7 @@
 	echo "</pre>";
 
 	echo "<hr><b>Activity</b><br><pre>";
-	print var_dump( $strap->activity->get("guid") );
+	print var_dump( $strap->activity->get(["guid" => "USER_GUID"]) );
 
 	echo "<hr><b>Month</b><br><pre>";
 	print var_dump( $strap->month->get() );
@@ -37,7 +37,7 @@
 	print var_dump( $strap->trigger_data->get() );
 
 	echo "<hr><b>User Info</b><br><pre>";
-	print var_dump( $strap->user->get("guid") );
+	print var_dump( $strap->user->get(["guid" => "USER_GUID"]) );
 
 	echo "<hr><b>Users</b><br><pre>";
 	print var_dump( $strap->users->get() );

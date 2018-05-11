@@ -16,7 +16,7 @@ class Strap {
     private $c = false;
 
 	// API Endpoint
-	private $apiURL = "https://api2.straphq.com";
+	private $apiURL = "https://api.curanexus.io";
 
 	// API Token
 	private $token = false;
