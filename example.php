@@ -1,52 +1,52 @@
 <?php
 
-	require_once './strap.class.php';
+	require_once './curanexus.class.php';
 
-	$strap = new Strap("STRAP_READ_TOKEN");
+	$curanexus = new CuraNEXUS("CURANEXUS_READ_TOKEN");
 
 	echo "GET Tests<hr><hr>";
 	echo "<b>Endpoints</b><br><pre>";
-	print var_dump( $strap->endpoints() );
+	print var_dump( $curanexus->endpoints() );
 	echo "</pre>";
 
 	echo "<hr><b>Activity</b><br><pre>";
-	print var_dump( $strap->activity->get(["guid" => "USER_GUID"]) );
+	print var_dump( $curanexus->activity->get(["guid" => "USER_GUID"]) );
 
 	echo "<hr><b>Month</b><br><pre>";
-	print var_dump( $strap->month->get() );
+	print var_dump( $curanexus->month->get() );
 
 	echo "<hr><b>Report</b><br><pre>";
-	print var_dump( $strap->report->get("report-id") );
+	print var_dump( $curanexus->report->get("report-id") );
 
 	echo "<hr><b>Report Food</b><br><pre>";
-	print var_dump( $strap->report_food->get( [ "id" => "report-id" ] ) );
+	print var_dump( $curanexus->report_food->get( [ "id" => "report-id" ] ) );
 
 	echo "<hr><b>Report Raw</b><br><pre>";
-	print var_dump( $strap->raw->get( [ "id" => "report-id" ] ) );
+	print var_dump( $curanexus->raw->get( [ "id" => "report-id" ] ) );
 
 	echo "<hr><b>Report Workout</b><br><pre>";
-	print var_dump( $strap->report_workout->get( [ "id" => "report-id" ] ) );
+	print var_dump( $curanexus->report_workout->get( [ "id" => "report-id" ] ) );
 
 	echo "<hr><b>Today</b><br><pre>";
-	print var_dump( $strap->today->get() );
+	print var_dump( $curanexus->today->get() );
 
 	echo "<hr><b>Trigger</b><br><pre>";
-	print var_dump( $strap->trigger->get("trigger-id") );
+	print var_dump( $curanexus->trigger->get("trigger-id") );
 
 	echo "<hr><b>Trigger Data</b><br><pre>";
-	print var_dump( $strap->trigger_data->get() );
+	print var_dump( $curanexus->trigger_data->get() );
 
 	echo "<hr><b>User Info</b><br><pre>";
-	print var_dump( $strap->user->get(["guid" => "USER_GUID"]) );
+	print var_dump( $curanexus->user->get(["guid" => "USER_GUID"]) );
 
 	echo "<hr><b>Users</b><br><pre>";
-	print var_dump( $strap->users->get() );
+	print var_dump( $curanexus->users->get() );
 
 	echo "<hr><b>Week</b><br><pre>";
-	print var_dump( $strap->week->get() );
+	print var_dump( $curanexus->week->get() );
 
 	echo "<hr><b>Word Cloud</b><br><pre>";
-	print var_dump( $strap->wordcloud->get() );
+	print var_dump( $curanexus->wordcloud->get() );
 
 
 ?>
