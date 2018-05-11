@@ -2,7 +2,7 @@
 
 	require_once './curanexus.class.php';
 
-	$curanexus = new CuraNEXUS("CURANEXUS_READ_TOKEN");
+	$curanexus = new CuraNEXUS("CURANEXUS_TOKEN");
 
 	echo "GET Tests<hr><hr>";
 	echo "<b>Endpoints</b><br><pre>";
